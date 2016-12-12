@@ -1,4 +1,4 @@
-function [] = main(imname, dof, iterations, maxSigma)
+function [] = main(imname, dof, iterations)
 im = imread(imname);
 imshow(im);
 hold on;
@@ -17,6 +17,7 @@ width = round(bigger(dofTop, size(im, 1) - dofBottom) / iterations);
 resultr = zeros(size(im, 1), size(im, 2));
 resultg = zeros(size(im, 1), size(im, 2));
 resultb = zeros(size(im, 1), size(im, 2));
+filter = gaussian2d(1);
 for a = 1:iterations
    upperl = dofTop - (a - 1) * width;
    if upperl > 0
@@ -34,9 +35,13 @@ for a = 1:iterations
        end
        masks(loweru : lowerl, :, a) = ones(lowerl - loweru + 1, w, 1);       
    end
-   stacksr(:, :, a) = myGaussFilt(im(:, :, 1), maxSigma / (iterations - a + 1));
-   stacksg(:, :, a) = myGaussFilt(im(:, :, 2), maxSigma / (iterations - a + 1));
-   stacksb(:, :, a) = myGaussFilt(im(:, :, 3), maxSigma / (iterations - a + 1));
+%    stacksr(:, :, a) = myGaussFilt(im(:, :, 1), maxSigma / (iterations - a + 1));
+%    stacksg(:, :, a) = myGaussFilt(im(:, :, 2), maxSigma / (iterations - a + 1));
+%    stacksb(:, :, a) = myGaussFilt(im(:, :, 3), maxSigma / (iterations - a + 1));
+   stacksr(:, :, a) = conv2(double(im(:, :, 1)), filter, 'same');
+   stacksg(:, :, a) = conv2(double(im(:, :, 2)), filter, 'same');
+   stacksb(:, :, a) = conv2(double(im(:, :, 3)), filter, 'same'); 
+   filter = conv2(filter, gaussian2d(2), 'full');
    resultr = resultr + masks(:, :, a) .* stacksr(:, :, a);
    resultg = resultg + masks(:, :, a) .* stacksg(:, :, a);
    resultb = resultb + masks(:, :, a) .* stacksb(:, :, a);
@@ -59,9 +64,9 @@ else
 end
 end
 
-function [f]= myGaussFilt(img, sigma)
-f = conv2(double(img), gaussian2d(sigma), 'same');
-end
+% function [f]= myGaussFilt(img, sigma)
+% f = conv2(double(img), gaussian2d(sigma), 'same');
+% end
 
 function [f] = gaussian2d(sigma)
 N = sigma * 2;

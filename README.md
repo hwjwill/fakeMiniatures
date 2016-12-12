@@ -6,5 +6,5 @@ This project create fake miniatures by simulating the effect of selective focus 
 
 # To run code
 ```
-main(<name of image file>, <depth of field>, <number of bands to blur above and below depth of field>, <maximum sigma>)
+main(<name of image file>, <depth of field>, <number of bands to blur above and below depth of field>)
 ``` 
